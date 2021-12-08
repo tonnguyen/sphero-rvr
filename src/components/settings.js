@@ -32,7 +32,7 @@ function Settings(props) {
                     {ids.map(id => <option key={id} value={id}>{id}</option>)}
                 </select>
             </div>
-            <div><button onClick={() => props.close({ gamepadId })}>OK</button></div>
+            <div><button onClick={() => props.close({ gamepadId: gamepadId || ids.length > 0 ? ids[0] : '' })}>OK</button></div>
         </>
     );
 }
