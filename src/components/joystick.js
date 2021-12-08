@@ -3,12 +3,16 @@ import useAnimationFrame from '../hooks/useAnimationFrame';
 import joystickBase from '../images/joystick-base.png';
 import joystickRed from '../images/joystick-red.png';
 
-function Joystick({ maxDistance, deadzone, left, onValue }) {
+function Joystick({ maxDistance, deadzone, left, onValue, defaultPosition }) {
     const stick = useRef(null);
     const [dragStart, setDragStart] = useState(null);
     const [active, setActive] = useState(false);
     const [value, setValue] = useState({ x: 0, y: 0 });
     const [touchId, setTouchId] = useState(null);
+
+    useEffect(() => {
+        stick.current.style.transform = `translate3d(${defaultPosition.x * 50}px, ${defaultPosition.y * 50}px, 0px)`;
+    }, [defaultPosition]);
 
     const handleDown = (event) => {
         setActive(true);
@@ -128,6 +132,7 @@ Joystick.defaultProps = {
     deadzone: 8,
     left: true,
     onValue: null,
+    defaultPosition: { x: 0, y: 0},
 }
 
 export default Joystick;
