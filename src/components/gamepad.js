@@ -1,22 +1,35 @@
 import { useCallback, useEffect, useState } from 'react';
 import useAnimationFrame from '../hooks/useAnimationFrame';
 
-const Gamepad = ({ onLeftYChange, onRightXChange }) => {
-    const [gamepad, setGamepad] = useState(null);
+const Gamepad = ({ id, onLeftYChange, onRightXChange }) => {
+    const [gamepadId, setGamepadId] = useState(id);
     const [leftY, setLeftY] = useState(0);
     const [rightX, setRightX] = useState(0);
     const gamepadConnected = useCallback((e) => {
-        const gp = e.gamepad;
-        if (isGamepad(gp)) {
-            setGamepad(gp);
+        // if no gamepad was configured, select the first one
+        if (gamepadId) {
+            return;
         }
-    }, [setGamepad]);
+        const gp = e.gamepad;
+        if (isGamepad(gp, id)) {
+            setGamepadId(gp.id);
+        }
+    }, [setGamepadId, gamepadId, id]);
 
     const gamepadDisconnected = useCallback((e) => {
-        if (gamepad && e.gamepad && gamepad.id === e.gamepad.id) {
-            setGamepad(null);
+        if (e.gamepad && gamepadId === e.gamepad.id) {
+            // if the gamepad is disconnected, try the first one
+            const gamepads = navigator.getGamepads();
+            for (let i = 0; i < gamepads.length; i++) {
+                const gp = gamepads[i];
+                if (gp && gp.id === gamepadId?.id) {
+                    setGamepadId(gp.id);
+                    return;
+                }
+            }
+            setGamepadId(null);
         }
-    }, [gamepad, setGamepad]);
+    }, [gamepadId, setGamepadId]);
 
     useEffect(() => {
         window.addEventListener('gamepadconnected', gamepadConnected);
@@ -25,14 +38,14 @@ const Gamepad = ({ onLeftYChange, onRightXChange }) => {
             window.removeEventListener('gamepadconnected', gamepadConnected);
             window.removeEventListener('gamepaddisconnected', gamepadDisconnected);
         }
-    }, [setGamepad, gamepadConnected, gamepadDisconnected]);
+    }, [setGamepadId, gamepadConnected, gamepadDisconnected]);
 
     useAnimationFrame(() => {
         const gamepads = navigator.getGamepads();
         let currentGp = null;
         for (let i = 0; i < gamepads.length; i++) {
             const gp = gamepads[i];
-            if (gp && gp.id === gamepad?.id) {
+            if (gp && gp.id === gamepadId) {
                 currentGp = gp;
                 break;
             }
@@ -58,7 +71,7 @@ const Gamepad = ({ onLeftYChange, onRightXChange }) => {
         }
     });
 
-    return <div>{`${gamepad?.id}`}</div>
+    return <div>{`${gamepadId}`}</div>
 }
 
 function isGamepad(gp) {

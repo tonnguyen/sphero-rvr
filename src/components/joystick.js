@@ -106,18 +106,18 @@ function Joystick({ maxDistance, deadzone, left, onValue }) {
         onValue && onValue(value);
     });
 
-    const containerStyle = { border: 1, width: 128, position: 'absolute', bottom: 25, opacity: 0.5, touchAction: 'none' };
+    const containerStyle = { border: 1, width: 128, position: 'absolute', bottom: 25, opacity: 0.1, touchAction: 'none' };
     if (left) {
         containerStyle.left = 25;
     } else {
         containerStyle.right = 25;
     }
     return (
-        <div style={containerStyle}>
-            <img src={joystickBase}/>
+        <div className="Joystick" style={containerStyle}>
+            <img src={joystickBase} alt="base"/>
             <div onMouseDown={handleDown} 
                 ref={stick} style={{ position: 'absolute', left: 32, top: 32 }}>
-            <img src={joystickRed}/>    
+            <img src={joystickRed} alt="stick"/>    
             </div>
         </div>
       );
