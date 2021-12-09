@@ -4,6 +4,8 @@ function Settings(props) {
     const [gamepadId, setGamepadId] = useState(props.settings.gamepadId);
     const [piAddress, setPiAddress] = useState(props.settings.piAddress);
     const [camera, setCamera] = useState(props.settings.camera);
+    const [joysticks, setJoysticks] = useState(props.settings.joysticks);
+    const [gauge, setGauge] = useState(props.settings.gauge);
     const [ids, setIds] = useState([]);
 
     const scan = useCallback(() => {
@@ -29,7 +31,7 @@ function Settings(props) {
 
     return (
         <form onSubmit={(e) => {
-            submit(props, ids, gamepadId, piAddress, camera);
+            submit(props, ids, gamepadId, piAddress, camera, joysticks, gauge);
             e.preventDefault();
         }}>
             <div>
@@ -47,16 +49,26 @@ function Settings(props) {
                 <label htmlFor="camera">Camera</label>
             </div>
             <div>
+                <input type="checkbox" id="joysticks" defaultChecked={joysticks} onChange={(e) => setJoysticks(!joysticks)} ></input>
+                <label htmlFor="joysticks">Joysticks</label>
+            </div>
+            <div>
+                <input type="checkbox" id="gauge" defaultChecked={gauge} onChange={(e) => setGauge(!gauge)} ></input>
+                <label htmlFor="gauge">Speedoneter</label>
+            </div>
+            <div>
             <input type="submit" value="Save" className='Button' /></div>
         </form>
     );
 }
 
-const submit = (props, ids, gamepadId, piAddress, camera) => {
+const submit = (props, ids, gamepadId, piAddress, camera, joysticks, gauge) => {
     props.close({ 
         gamepadId: gamepadId ?? (ids.length > 0 ? ids[0] : ''),
         piAddress,
         camera,
+        joysticks,
+        gauge,
     });
 }
 

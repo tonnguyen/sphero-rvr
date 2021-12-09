@@ -5,11 +5,10 @@ import Settings from './components/settings';
 
 function App() {
   const [screen, setScreen] = useState('main');
-  const [settings, setSettings] = useState({ piAddress: 'raspberrypi.local:3000', camera: true });
+  const [settings, setSettings] = useState({ piAddress: 'raspberrypi.local:3000', camera: true, joysticks: true, gauge: true });
   return (
     <div className="App">
-        {screen === 'main' && <Main gamepadId={settings.gamepadId} camera={settings.camera}
-                              piAddress={settings.piAddress} showSettings={() => setScreen('settings')} />}
+        {screen === 'main' && <Main settings={settings} showSettings={() => setScreen('settings')} />}
         {screen === 'settings' && <Settings settings={settings} close={(settings) => {
           setSettings(settings);
           setScreen('main');
