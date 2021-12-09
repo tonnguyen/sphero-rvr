@@ -11,6 +11,7 @@
 // opt-in, read https://cra.link/PWA
 
 const isLocalhost = Boolean(
+  window.location.hostname === 'rvr.localtest.me' ||
     window.location.hostname === 'localhost' ||
       // [::1] is the IPv6 localhost address.
       window.location.hostname === '[::1]' ||

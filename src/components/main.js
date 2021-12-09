@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Gamepad from './gamepad';
 import Joystick from './joystick';
 import CogWheelIcon from '../images/cogwheel.svg';
+import Battery from './battery';
 
 function Main(props) {
   const [value1, setValue1] = useState({ x: 0, y: 0 });
@@ -11,6 +12,7 @@ function Main(props) {
   return (
     <div className="LiveCamera" style={{ backgroundImage: `url(http://192.168.0.73:3000/stream.mjpg)` }}>
         {/* <img src={'http://raspberrypi.local:3000/stream.mjpg'} alt="Live camera" /> */}
+        <Battery level={70} />
         <img className="Settings" src={CogWheelIcon} onClick={props.showSettings} alt="Settings" />
         <div>Joystick 1: {value1.y.toFixed(2)}</div>
         <div>Joystick 2: {value2.x.toFixed(2)}</div>
