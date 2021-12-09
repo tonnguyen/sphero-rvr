@@ -13,9 +13,9 @@ function Main(props) {
   const [speed, setSpeed] = useState(120);
   return (
     <div className="Main">
-        <object data={`http://${props.piAddress}/stream.mjpg`} type="image/jpg" style={{ width: '100%' }}>
+        {props.camera && <object data={`http://${props.piAddress}/stream.mjpg`} type="image/jpg" style={{ width: '100%' }}>
           <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=" alt="Live camera" style={{ width: '100%' }} />
-        </object>
+        </object>}
         <Battery level={70} />
         <Range className="SppedRange" value={speed} onChange={setSpeed} />
         <img className="Settings" src={CogWheelIcon} onClick={props.showSettings} alt="Settings" />

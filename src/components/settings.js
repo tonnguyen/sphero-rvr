@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 function Settings(props) {
     const [gamepadId, setGamepadId] = useState(props.settings.gamepadId);
     const [piAddress, setPiAddress] = useState(props.settings.piAddress);
+    const [camera, setCamera] = useState(props.settings.camera);
     const [ids, setIds] = useState([]);
 
     const scan = useCallback(() => {
@@ -28,7 +29,7 @@ function Settings(props) {
 
     return (
         <form onSubmit={(e) => {
-            submit(props, ids, gamepadId, piAddress);
+            submit(props, ids, gamepadId, piAddress, camera);
             e.preventDefault();
         }}>
             <div>
@@ -42,15 +43,20 @@ function Settings(props) {
                 <input type="text" value={piAddress} onChange={(e) => setPiAddress(e.target.value)} ></input>
             </div>
             <div>
+                <input type="checkbox" id="camera" defaultChecked={camera} onChange={(e) => setCamera(!camera)} ></input>
+                <label htmlFor="camera">Camera</label>
+            </div>
+            <div>
             <input type="submit" value="Save" className='Button' /></div>
         </form>
     );
 }
 
-const submit = (props, ids, gamepadId, piAddress) => {
+const submit = (props, ids, gamepadId, piAddress, camera) => {
     props.close({ 
         gamepadId: gamepadId ?? (ids.length > 0 ? ids[0] : ''),
         piAddress,
+        camera,
     });
 }
 
