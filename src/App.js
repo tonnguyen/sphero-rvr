@@ -5,7 +5,7 @@ import Settings from './components/settings';
 
 function App() {
   const [screen, setScreen] = useState('main');
-  const [settings, setSettings] = useState({ piAddress: 'raspberrypi.local:3000', camera: true, joysticks: true, gauge: true });
+  const [settings, setSettings] = useState({ piAddress: 'raspberrypi.local', camera: true, joysticks: true, gauge: true });
   return (
     <div className="App">
         {screen === 'main' && <Main settings={settings} showSettings={() => setScreen('settings')} />}

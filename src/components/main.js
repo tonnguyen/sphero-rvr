@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Gamepad from './gamepad';
 import Joystick from './joystick';
 import CogWheelIcon from '../images/cogwheel.svg';
 import Battery from './battery';
 import Range from './range';
 import { RadialGauge } from 'react-canvas-gauges';
+import { SpheroRvrToy } from 'sdk-v4-convenience-raspberry-pi-client-js';
 
 function Main(props) {
   const [value1, setValue1] = useState({ x: 0, y: 0 });
@@ -12,12 +13,22 @@ function Main(props) {
   const [leftAxis, setLeftAxis] = useState({ x: 0, y: 0 });
   const [rightAxis, setRightAxis] = useState({ x: 0, y: 0 });
   const [speed, setSpeed] = useState(120);
+  const [battery, setBattery] = useState(0);
+  const rvrToy = useRef(null);
+  useEffect(() => {
+    rvrToy.current = new SpheroRvrToy(props.settings.piAddress, '2010');
+    rvrToy.current.getBatteryPercentage(1).then((data) => {
+      const obj = data ? JSON.parse(data) : null;
+      setBattery(obj?.percentage ?? 0);
+    });
+  }, [props.settings.piAddress]);
+
   return (
     <div className="Main">
-        {props.settings.camera && <object data={`http://${props.settings.piAddress}/stream.mjpg`} type="image/jpg" style={{ width: '100%' }}>
+        {props.settings.camera && <object data={`http://${props.settings.piAddress}:3000/stream.mjpg`} type="image/jpg" style={{ width: '100%' }}>
           <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=" alt="Live camera" style={{ width: '100%' }} />
         </object>}
-        <Battery level={70} />
+        <Battery level={battery} />
         <Range className="SppedRange" value={speed} onChange={setSpeed} />
         <img className="Settings" src={CogWheelIcon} onClick={props.showSettings} alt="Settings" />
         <div className='Info'>
