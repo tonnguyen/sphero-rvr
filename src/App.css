@@ -13,6 +13,14 @@
   color: white;
 }
 
+.LiveCamera {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 100%;
+  min-height: 100vh;
+}
+
 .Settings {
   position: absolute;
   top: 20px;

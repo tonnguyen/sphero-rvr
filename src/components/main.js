@@ -9,7 +9,8 @@ function Main(props) {
   const [leftAxis, setLeftAxis] = useState({ x: 0, y: 0 });
   const [rightAxis, setRightAxis] = useState({ x: 0, y: 0 });
   return (
-    <>
+    <div className="LiveCamera" style={{ backgroundImage: `url(http://192.168.0.73:3000/stream.mjpg)` }}>
+        {/* <img src={'http://raspberrypi.local:3000/stream.mjpg'} alt="Live camera" /> */}
         <img className="Settings" src={CogWheelIcon} onClick={props.showSettings} alt="Settings" />
         <div>Joystick 1: {value1.y.toFixed(2)}</div>
         <div>Joystick 2: {value2.x.toFixed(2)}</div>
@@ -19,7 +20,7 @@ function Main(props) {
         <Joystick left={false} onValue={setValue2} defaultPosition={rightAxis} />
         <Gamepad id={props.gamepadId} onLeftYChange={(leftY) => setLeftAxis({ x: 0, y: leftY })} 
                                       onRightXChange={(rightX) => setRightAxis({ x: rightX, y: 0 })} />
-    </>
+    </div>
   );
 }
 
