@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Gamepad from './gamepad';
 import Joystick from './joystick';
 import CogWheelIcon from '../images/cogwheel.svg';
@@ -14,14 +14,28 @@ function Main(props) {
   const [rightAxis, setRightAxis] = useState({ x: 0, y: 0 });
   const [speed, setSpeed] = useState(120);
   const [battery, setBattery] = useState(0);
-  const rvrToy = useRef(null);
+  const [rvrToy, setRvrToy] = useState(null);
   useEffect(() => {
-    rvrToy.current = new SpheroRvrToy(props.settings.piAddress, '2010');
-    rvrToy.current.getBatteryPercentage(1).then((data) => {
-      const obj = data ? JSON.parse(data) : null;
-      setBattery(obj?.percentage ?? 0);
-    });
+    const connect = async() => {
+      try {
+        const car = new SpheroRvrToy(props.settings.piAddress, '2010');
+        const data = await car.getBatteryPercentage(1)
+        const obj = data ? JSON.parse(data) : null;
+        setBattery(obj?.percentage ?? 0);
+        setRvrToy(car);
+      } catch {
+        setRvrToy(null);
+      }
+    }
+    connect();
   }, [props.settings.piAddress]);
+
+  const onLeftYChange = useCallback((leftY) => setLeftAxis({ x: 0, y: leftY }), [setLeftAxis]);
+  const onRightXChange = useCallback((rightX) => setRightAxis({ x: rightX, y: 0 }), [setRightAxis]);
+  const onLeftBumperPressed = useCallback(() => setSpeed(Math.max(speed - 1, 1)), [speed, setSpeed]);
+  const onRightBumperPressed = useCallback(() => setSpeed(Math.min(speed + 1, 255)), [speed, setSpeed]);
+  const onLeftTriggerPressed = useCallback((value) => setLeftAxis({ x: 0, y: value }), [setLeftAxis]);
+  const onRightTriggerPressed = useCallback((value) => setLeftAxis({ x: 0, y: -value }), [setLeftAxis]);
 
   return (
     <div className="Main">
@@ -38,14 +52,7 @@ function Main(props) {
           <div>Right: {rightAxis.x.toFixed(2)}</div>
           <div>{props.settings.gamepadId}</div>
           {props.settings.gauge && <div>
-            <RadialGauge
-              units='cm/s'
-              width={300}
-              value={speed}
-              minValue={0}
-              startAngle={90}
-              ticksAngle={180}
-              maxValue={180}
+            <RadialGauge units='cm/s' width={300} value={speed} minValue={0} startAngle={90} ticksAngle={180} maxValue={180}
               majorTicks={["0",
               "20",
               "40",
@@ -56,7 +63,6 @@ function Main(props) {
               "140",
               "160",
               "180"]}
-              minorTicks={2}
               highlights={[
                 {
                     "from": 140,
@@ -64,13 +70,8 @@ function Main(props) {
                     "color": "rgba(200, 50, 50, .75)"
                 }
               ]}
-              borders={false}
-              colorPlate={'#000'}
-              animationDuration={500}
-              animationRule={'linear'}
-              colorNumbers={'#eee'}
-              colorBorderOuter={'#000'}
-              colorBorderMiddle={'#000'}
+              minorTicks={2} borders={false} colorPlate={'#000'} animationDuration={500}
+              animationRule={'linear'} colorNumbers={'#eee'} colorBorderOuter={'#000'} colorBorderMiddle={'#000'}
             ></RadialGauge>
           </div>}
         </div>
@@ -78,12 +79,12 @@ function Main(props) {
           <Joystick left={true} onValue={setValue1} defaultPosition={leftAxis} />
           <Joystick left={false} onValue={setValue2} defaultPosition={rightAxis} />
         </>}
-        <Gamepad id={props.settings.gamepadId} onLeftYChange={(leftY) => setLeftAxis({ x: 0, y: leftY })} 
-                                      onRightXChange={(rightX) => setRightAxis({ x: rightX, y: 0 })}
-                                      onLeftBumperPressed={() => setSpeed(Math.max(speed - 1, 1))}
-                                      onRightBumperPressed={() => setSpeed(Math.min(speed + 1, 255))}
-                                      onLeftTriggerPressed={(value) => setLeftAxis({ x: 0, y: value })} 
-                                      onRightTriggerPressed={(value) => setLeftAxis({ x: 0, y: -value })} 
+        <Gamepad id={props.settings.gamepadId} onLeftYChange={onLeftYChange} 
+                                      onRightXChange={onRightXChange}
+                                      onLeftBumperPressed={onLeftBumperPressed}
+                                      onRightBumperPressed={onRightBumperPressed}
+                                      onLeftTriggerPressed={onLeftTriggerPressed} 
+                                      onRightTriggerPressed={onRightTriggerPressed} 
         />
     </div>
   );

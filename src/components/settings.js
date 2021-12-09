@@ -1,11 +1,11 @@
 import { useState, useCallback, useEffect } from 'react';
 
-function Settings(props) {
-    const [gamepadId, setGamepadId] = useState(props.settings.gamepadId);
-    const [piAddress, setPiAddress] = useState(props.settings.piAddress);
-    const [camera, setCamera] = useState(props.settings.camera);
-    const [joysticks, setJoysticks] = useState(props.settings.joysticks);
-    const [gauge, setGauge] = useState(props.settings.gauge);
+function Settings({ settings, close }) {
+    const [gamepadId, setGamepadId] = useState(settings.gamepadId);
+    const [piAddress, setPiAddress] = useState(settings.piAddress);
+    const [camera, setCamera] = useState(settings.camera);
+    const [joysticks, setJoysticks] = useState(settings.joysticks);
+    const [gauge, setGauge] = useState(settings.gauge);
     const [ids, setIds] = useState([]);
 
     const scan = useCallback(() => {
@@ -29,11 +29,19 @@ function Settings(props) {
 
     useEffect(() => scan(), [scan]);
 
+    const submit = useCallback((e) => {
+        close({ 
+            gamepadId: gamepadId ?? (ids.length > 0 ? ids[0] : ''),
+            piAddress,
+            camera,
+            joysticks,
+            gauge,
+        });
+        e.preventDefault();
+    }, [close, gamepadId, ids, piAddress, camera, joysticks, gauge]);
+
     return (
-        <form onSubmit={(e) => {
-            submit(props, ids, gamepadId, piAddress, camera, joysticks, gauge);
-            e.preventDefault();
-        }}>
+        <form onSubmit={submit}>
             <div>
                 <label>Controller:</label>
                 <select value={gamepadId} onChange={(e) => setGamepadId(e.target.value)}>
@@ -60,16 +68,6 @@ function Settings(props) {
             <input type="submit" value="Save" className='Button' /></div>
         </form>
     );
-}
-
-const submit = (props, ids, gamepadId, piAddress, camera, joysticks, gauge) => {
-    props.close({ 
-        gamepadId: gamepadId ?? (ids.length > 0 ? ids[0] : ''),
-        piAddress,
-        camera,
-        joysticks,
-        gauge,
-    });
 }
 
 export default Settings;
