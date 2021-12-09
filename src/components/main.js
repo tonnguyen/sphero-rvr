@@ -30,6 +30,8 @@ function Main(props) {
                                       onRightXChange={(rightX) => setRightAxis({ x: rightX, y: 0 })}
                                       onLeftBumperPressed={() => setSpeed(Math.max(speed - 1, 1))}
                                       onRightBumperPressed={() => setSpeed(Math.min(speed + 1, 255))}
+                                      onLeftTriggerPressed={(value) => setLeftAxis({ x: 0, y: value })} 
+                                      onRightTriggerPressed={(value) => setLeftAxis({ x: 0, y: -value })} 
         />
     </>
   );

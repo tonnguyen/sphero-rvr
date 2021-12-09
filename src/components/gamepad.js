@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import useAnimationFrame from '../hooks/useAnimationFrame';
 
-const Gamepad = ({ id, onLeftYChange, onRightXChange, onLeftBumperPressed, onRightBumperPressed }) => {
+const Gamepad = ({ id, onLeftYChange, onRightXChange, onLeftBumperPressed, onRightBumperPressed,
+                    onLeftTriggerPressed, onRightTriggerPressed }) => {
     const [gamepadId, setGamepadId] = useState(id);
-    const [leftY, setLeftY] = useState(0);
-    const [rightX, setRightX] = useState(0);
+    const leftY = useRef(0);
+    const rightX = useRef(0);
+    const CONTROLLER = CONTROLLERS.XBOX;
     const gamepadConnected = useCallback((e) => {
         // if no gamepad was configured, select the first one
         if (gamepadId) {
@@ -14,7 +16,7 @@ const Gamepad = ({ id, onLeftYChange, onRightXChange, onLeftBumperPressed, onRig
         if (isGamepad(gp, id)) {
             setGamepadId(gp.id);
         }
-    }, [setGamepadId, gamepadId, id]);
+    }, [gamepadId, setGamepadId, id]);
 
     const gamepadDisconnected = useCallback((e) => {
         if (e.gamepad && gamepadId === e.gamepad.id) {
@@ -38,7 +40,7 @@ const Gamepad = ({ id, onLeftYChange, onRightXChange, onLeftBumperPressed, onRig
             window.removeEventListener('gamepadconnected', gamepadConnected);
             window.removeEventListener('gamepaddisconnected', gamepadDisconnected);
         }
-    }, [setGamepadId, gamepadConnected, gamepadDisconnected]);
+    }, [gamepadConnected, gamepadDisconnected]);
 
     useAnimationFrame(() => {
         const gamepads = navigator.getGamepads();
@@ -53,31 +55,39 @@ const Gamepad = ({ id, onLeftYChange, onRightXChange, onLeftBumperPressed, onRig
         if (!currentGp) {
             return;
         }
-        /**
-         * Left stick X: 0
-         * Left stick Y: 1
-         * Right stick X: 2
-         * Right stick Y: 3
-         */
-        const lY = setDeadzone(currentGp.axes[1]);
-        const rX = setDeadzone(currentGp.axes[2]);
-        if (leftY !== lY) {
-            setLeftY(lY);
-            onLeftYChange(lY);
-        }
-        if (rightX !== rX) {
-            setRightX(rX);
-            onRightXChange(rX);
+        
+        let lY = setDeadzone(currentGp.axes[CONTROLLER.LEFT_AXIS_Y]);
+        const rX = setDeadzone(currentGp.axes[CONTROLLER.RIGHT_AXIS_X]);
+        if (lY !== 0) {
+            if (leftY.current !== lY) {
+                leftY.current = lY;
+                onLeftYChange(lY);
+            }
+        } else {
+            lY = setDeadzone(currentGp.buttons[CONTROLLER.RIGHT_TRIGGER].value);
+            if (lY !== 0) {
+                if (leftY.current !== lY) {
+                    leftY.current = lY;
+                    onRightTriggerPressed(lY);
+                }
+            } else {
+                lY = setDeadzone(currentGp.buttons[CONTROLLER.LEFT_TRIGGER].value);
+                if (leftY.current !== lY) {
+                    leftY.current = lY;
+                    onLeftTriggerPressed(lY);
+                }
+            }
         }
 
-        /**
-         * Left bumper: 4
-         * Right bumper: 5
-         */
-        if (currentGp.buttons[4].pressed && currentGp.buttons[4].value === 1.0) {
+        if (rightX.current !== rX) {
+            rightX.current = rX;
+            onRightXChange(rX);
+        }
+        
+        if (currentGp.buttons[CONTROLLER.LEFT_BUMPER].pressed && currentGp.buttons[CONTROLLER.LEFT_BUMPER].value === 1.0) {
             onLeftBumperPressed();
         }
-        if (currentGp.buttons[5].pressed && currentGp.buttons[5].value === 1.0) {
+        if (currentGp.buttons[CONTROLLER.RIGHT_BUMPER].pressed && currentGp.buttons[CONTROLLER.RIGHT_BUMPER].value === 1.0) {
             onRightBumperPressed();
         }
     });
@@ -91,7 +101,7 @@ function isGamepad(gp) {
 
 function setDeadzone(v) {
     // Anything smaller than this is assumed to be 0,0
-    const DEADZONE = 0.2;
+    const DEADZONE = 0.1;
 
     if (Math.abs(v) < DEADZONE) {
         // In the dead zone, set to 0
@@ -119,6 +129,32 @@ function setDeadzone(v) {
 
     }
     return v;
+}
+
+const XBOX_CONTROLLER = {
+    A_BUTTON: 0,
+    B_BUTTON: 1,
+    X_BUTTON: 2,
+    Y_BUTTON: 3,
+    LEFT_BUMPER: 4,
+    RIGHT_BUMPER: 5,
+    LEFT_TRIGGER: 6,
+    RIGHT_TRIGGER: 7,
+    VIEW_BUTTON: 8,
+    MENU_BUTTON: 9,
+    UP_DPAD: 12,
+    DOWN_DPAD: 13,
+    LEFT_DPAD: 14,
+    RIGHT_DPAD: 15,
+    XBOX_BUTTON: 16,
+    LEFT_AXIS_X: 0,
+    LEFT_AXIS_Y: 1,
+    RIGHT_AXIS_X: 2,
+    RIGHT_AXIS_Y: 3,
+}
+
+const CONTROLLERS = {
+    XBOX: XBOX_CONTROLLER,
 }
 
 export default Gamepad;
