@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import useAnimationFrame from '../hooks/useAnimationFrame';
 
-const Gamepad = ({ id, onLeftYChange, onRightXChange }) => {
+const Gamepad = ({ id, onLeftYChange, onRightXChange, onLeftBumperPressed, onRightBumperPressed }) => {
     const [gamepadId, setGamepadId] = useState(id);
     const [leftY, setLeftY] = useState(0);
     const [rightX, setRightX] = useState(0);
@@ -69,9 +69,20 @@ const Gamepad = ({ id, onLeftYChange, onRightXChange }) => {
             setRightX(rX);
             onRightXChange(rX);
         }
+
+        /**
+         * Left bumper: 4
+         * Right bumper: 5
+         */
+        if (currentGp.buttons[4].pressed && currentGp.buttons[4].value === 1.0) {
+            onLeftBumperPressed();
+        }
+        if (currentGp.buttons[5].pressed && currentGp.buttons[5].value === 1.0) {
+            onRightBumperPressed();
+        }
     });
 
-    return <div>{`${gamepadId}`}</div>
+    return <div></div>
 }
 
 function isGamepad(gp) {
