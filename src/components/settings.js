@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 
 function Settings(props) {
-    const [gamepadId, setGamepadId] = useState(props.gamepadId);
+    const [gamepadId, setGamepadId] = useState(props.settings.gamepadId);
+    const [piAddress, setPiAddress] = useState(props.settings.piAddress);
     const [ids, setIds] = useState([]);
 
     const scan = useCallback(() => {
@@ -26,15 +27,31 @@ function Settings(props) {
     useEffect(() => scan(), [scan]);
 
     return (
-        <>
+        <form onSubmit={(e) => {
+            submit(props, ids, gamepadId, piAddress);
+            e.preventDefault();
+        }}>
             <div>
+                <label>Controller:</label>
                 <select value={gamepadId} onChange={(e) => setGamepadId(e.target.value)}>
                     {ids.map(id => <option key={id} value={id}>{id}</option>)}
                 </select>
             </div>
-            <div><button onClick={() => props.close({ gamepadId: gamepadId || (ids.length > 0 ? ids[0] : '') })}>OK</button></div>
-        </>
+            <div>
+                <label>Pi address:</label>
+                <input type="text" value={piAddress} onChange={(e) => setPiAddress(e.target.value)} ></input>
+            </div>
+            <div>
+            <input type="submit" value="Save" className='Button' /></div>
+        </form>
     );
+}
+
+const submit = (props, ids, gamepadId, piAddress) => {
+    props.close({ 
+        gamepadId: gamepadId ?? (ids.length > 0 ? ids[0] : ''),
+        piAddress,
+    });
 }
 
 export default Settings;

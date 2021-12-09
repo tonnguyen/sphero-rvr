@@ -12,8 +12,10 @@ function Main(props) {
   const [rightAxis, setRightAxis] = useState({ x: 0, y: 0 });
   const [speed, setSpeed] = useState(120);
   return (
-    <div className="Main" style={{ backgroundImage: `url(http://192.168.0.73:3000/stream.mjpg)` }}>
-        {/* <img src={'http://raspberrypi.local:3000/stream.mjpg'} alt="Live camera" /> */}
+    <div className="Main">
+        <object data={`http://${props.piAddress}/stream.mjpg`} type="image/jpg" style={{ width: '100%' }}>
+          <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=" alt="Live camera" style={{ width: '100%' }} />
+        </object>
         <Battery level={70} />
         <Range className="SppedRange" value={speed} onChange={setSpeed} />
         <img className="Settings" src={CogWheelIcon} onClick={props.showSettings} alt="Settings" />

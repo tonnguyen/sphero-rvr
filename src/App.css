@@ -11,9 +11,6 @@
 }
 
 .Main {
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -76,7 +73,8 @@
   height: 9px;
 }
 
-button {
+.Button {
+  margin-top: 5px;
   border: 0;
   outline: 0;
   cursor: pointer;
