@@ -26,14 +26,14 @@ function Settings(props) {
     useEffect(() => scan(), [scan]);
 
     return (
-        <div style={{ flexDirection: 'column' }}>
+        <>
             <div>
                 <select value={gamepadId} onChange={(e) => setGamepadId(e.target.value)}>
                     {ids.map(id => <option key={id} value={id}>{id}</option>)}
                 </select>
             </div>
             <div><button onClick={() => props.close({ gamepadId: gamepadId || (ids.length > 0 ? ids[0] : '') })}>OK</button></div>
-        </div>
+        </>
     );
 }
 

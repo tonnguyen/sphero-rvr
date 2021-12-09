@@ -7,7 +7,7 @@ function App() {
   const [screen, setScreen] = useState('main');
   const [gamepadId, setGamepadId] = useState('');
   return (
-    <div className="App" style={{ backgroundImage: `url(http://192.168.0.73:3000/stream.mjpg)` }}>
+    <div className="App">
         {screen === 'main' && <Main gamepadId={gamepadId} showSettings={() => setScreen('settings')} />}
         {screen === 'settings' && <Settings gamepadId={gamepadId} close={(settings) => {
           setGamepadId(settings.gamepadId);

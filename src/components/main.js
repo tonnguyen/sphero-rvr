@@ -12,7 +12,7 @@ function Main(props) {
   const [rightAxis, setRightAxis] = useState({ x: 0, y: 0 });
   const [speed, setSpeed] = useState(120);
   return (
-    <>
+    <div className="Main" style={{ backgroundImage: `url(http://192.168.0.73:3000/stream.mjpg)` }}>
         {/* <img src={'http://raspberrypi.local:3000/stream.mjpg'} alt="Live camera" /> */}
         <Battery level={70} />
         <Range className="SppedRange" value={speed} onChange={setSpeed} />
@@ -33,7 +33,7 @@ function Main(props) {
                                       onLeftTriggerPressed={(value) => setLeftAxis({ x: 0, y: value })} 
                                       onRightTriggerPressed={(value) => setLeftAxis({ x: 0, y: -value })} 
         />
-    </>
+    </div>
   );
 }
 
