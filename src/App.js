@@ -5,7 +5,7 @@ import Settings from './components/settings';
 
 function App() {
   const [screen, setScreen] = useState('main');
-  const [settings, setSettings] = useState({ piAddress: 'raspberrypi.local', camera: true, joysticks: true, gauge: true });
+  const [settings, setSettings] = useState({ piAddress: 'raspberrypi.local', camera: true, joysticks: true, gauge: true, fullscreen: false });
   const showSettings = useCallback(() => setScreen('settings'), [setScreen]);
   const closeSettings = useCallback(settings => {
     setSettings(settings);

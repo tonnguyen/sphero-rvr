@@ -5,7 +5,6 @@ const Gamepad = ({ id, onLeftYChange, onRightXChange, onLeftBumperPressed, onRig
                     onLeftTriggerPressed, onRightTriggerPressed }) => {
     const [gamepadId, setGamepadId] = useState(id);
     const leftY = useRef(0);
-    const rightX = useRef(0);
     const CONTROLLER = CONTROLLERS.XBOX;
     const gamepadConnected = useCallback((e) => {
         // if no gamepad was configured, select the first one
@@ -79,10 +78,7 @@ const Gamepad = ({ id, onLeftYChange, onRightXChange, onLeftBumperPressed, onRig
             }
         }
 
-        if (rightX.current !== rX) {
-            rightX.current = rX;
-            onRightXChange(rX);
-        }
+        onRightXChange(rX);
         
         if (currentGp.buttons[CONTROLLER.LEFT_BUMPER].pressed && currentGp.buttons[CONTROLLER.LEFT_BUMPER].value === 1.0) {
             onLeftBumperPressed();

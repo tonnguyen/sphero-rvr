@@ -6,6 +6,7 @@ function Settings({ settings, close }) {
     const [camera, setCamera] = useState(settings.camera);
     const [joysticks, setJoysticks] = useState(settings.joysticks);
     const [gauge, setGauge] = useState(settings.gauge);
+    const [fullscreen, setFullscreen] = useState(settings.fullscreen);
     const [ids, setIds] = useState([]);
 
     const scan = useCallback(() => {
@@ -36,9 +37,12 @@ function Settings({ settings, close }) {
             camera,
             joysticks,
             gauge,
+            fullscreen,
         });
+        fullscreen && document.fullscreenEnabled && !document.fullscreenElement && document.body.requestFullscreen();
+        !fullscreen && document.fullscreenElement && document.exitFullscreen();
         e.preventDefault();
-    }, [close, gamepadId, ids, piAddress, camera, joysticks, gauge]);
+    }, [close, gamepadId, ids, piAddress, camera, joysticks, gauge, fullscreen]);
 
     return (
         <form onSubmit={submit}>
@@ -65,7 +69,12 @@ function Settings({ settings, close }) {
                 <label htmlFor="gauge">Speedoneter</label>
             </div>
             <div>
-            <input type="submit" value="Save" className='Button' /></div>
+                <input type="checkbox" id="fullscreen" defaultChecked={fullscreen} onChange={(e) => setFullscreen(!fullscreen)} ></input>
+                <label htmlFor="fullscreen">Fullscreen</label>
+            </div>
+            <div>
+                <input type="submit" value="Save" className='Button' />
+            </div>
         </form>
     );
 }

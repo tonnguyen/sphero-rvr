@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import useAnimationFrame from '../hooks/useAnimationFrame';
 import joystickBase from '../images/joystick-base.png';
 import joystickRed from '../images/joystick-red.png';
 
@@ -7,7 +6,6 @@ function Joystick({ maxDistance, deadzone, left, onValue, defaultPosition }) {
     const stick = useRef(null);
     const [dragStart, setDragStart] = useState(null);
     const [active, setActive] = useState(false);
-    const [value, setValue] = useState({ x: 0, y: 0 });
     const [touchId, setTouchId] = useState(null);
 
     useEffect(() => {
@@ -71,8 +69,8 @@ function Joystick({ maxDistance, deadzone, left, onValue, defaultPosition }) {
         const xPercent = parseFloat((xPosition2 / maxDistance).toFixed(4));
         const yPercent = parseFloat((yPosition2 / maxDistance).toFixed(4));
         
-        setValue({ x: xPercent, y: yPercent });
-    }, [active, deadzone, dragStart, maxDistance, touchId]);
+        onValue && onValue({ x: xPercent, y: yPercent });
+    }, [onValue, active, deadzone, dragStart, maxDistance, touchId]);
 
     const handleUp = useCallback(event => {
         if (!active ) return;
@@ -85,10 +83,10 @@ function Joystick({ maxDistance, deadzone, left, onValue, defaultPosition }) {
         stick.current.style.transform = `translate3d(0px, 0px, 0px)`;
 
         // reset everything
-        setValue({ x: 0, y: 0 });
+        onValue && onValue({ x: 0, y: 0 });
         setTouchId(null);
         setActive(false);
-    }, [active, touchId]);
+    }, [onValue, active, touchId]);
 
     useEffect(() => {
         document.addEventListener('mousemove', handleMove, {passive: false});
@@ -105,10 +103,6 @@ function Joystick({ maxDistance, deadzone, left, onValue, defaultPosition }) {
             stickRef.removeEventListener('touchstart', handleDown);
         }
     }, [handleMove, handleUp]);
-
-    useAnimationFrame(() => {
-        onValue && onValue(value);
-    });
 
     const containerStyle = { border: 1, width: 128, position: 'absolute', bottom: 25, opacity: 0.1, touchAction: 'none' };
     if (left) {
