@@ -87,8 +87,9 @@ function Main(props) {
           const velocity = Math.sqrt((data.X ** 2) + (data.Y ** 2));
           setVelocity(velocity);
         });
-      } catch {
+      } catch(e) {
         setRvrToy(null);
+        alert(`Unable to connect to RVR: ${e.message}`);
       }
     }
     connect();
