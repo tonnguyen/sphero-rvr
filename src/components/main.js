@@ -53,9 +53,6 @@ function throttle(func, wait, options) {
 };
 
 const throttledDriveWithHeading = throttle((rvrToy, speed, theta, backward) => {
-  if (!rvrToy) {
-    return;
-  }
   // The driveWithHeading command takes in a speed you'd like to drive at and a direction 
   // (angle between 0 and 360) that you'd like to drive in. There is also an optional 
   // third parameter that allows you to drive the RVR in reverse, with a value of "1".
@@ -83,10 +80,18 @@ function Main(props) {
         setBattery(obj?.percentage ?? 0);
         setRvrToy(car);
         car.getDriveControl().resetHeading();
-        car.getSensorControl().enableSensor(car.getSensorControl().velocity, data => {
+        const sensorControl = car.getSensorControl();
+        sensorControl.enableSensor(sensorControl.velocity, data => {
           const velocity = Math.sqrt((data.X ** 2) + (data.Y ** 2));
           setVelocity(velocity);
         });
+        if (sensorControl.isStreaming) {
+          sensorControl.clearSensorStreaming();
+        }
+        sensorControl.startSensorStreaming(100);
+        return () => {
+          sensorControl.clearSensorStreaming();
+        }
       } catch(e) {
         setRvrToy(null);
         alert(`Unable to connect to RVR: ${e.message}`);
@@ -97,6 +102,9 @@ function Main(props) {
 
   // drive the car whenever leftAxis or rightAxis changed
   useEffect(() => {
+    if (!rvrToy) {
+      return;
+    }
     if (lastLeftAxisY.current === 0 && lastRightAxisX.current === 0 && leftAxis.y === 0 && rightAxis.x === 0) {
       return;
     }
