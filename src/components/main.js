@@ -6,6 +6,7 @@ import Battery from './battery';
 import Range from './range';
 import { RadialGauge } from 'react-canvas-gauges';
 import { SpheroRvrToy } from 'sdk-v4-convenience-raspberry-pi-client-js';
+import throttle from '../utils/throttle';
 
 /**
  * Normalizes a value to be on a new scale defined by newMin and newMax.
@@ -14,43 +15,6 @@ import { SpheroRvrToy } from 'sdk-v4-convenience-raspberry-pi-client-js';
 function normalize(value, min, max, newMin, newMax) {
 	return ((value - min) / (max - min)) * (newMax - newMin) + newMin;
 }
-
-// Returns a function, that, when invoked, will only be triggered at most once
-// during a given window of time. Normally, the throttled function will run
-// as much as it can, without ever going more than once per `wait` duration;
-// but if you'd like to disable the execution on the leading edge, pass
-// `{leading: false}`. To disable execution on the trailing edge, ditto.
-function throttle(func, wait, options) {
-  var context, args, result;
-  var timeout = null;
-  var previous = 0;
-  if (!options) options = {};
-  var later = function() {
-    previous = options.leading === false ? 0 : Date.now();
-    timeout = null;
-    result = func.apply(context, args);
-    if (!timeout) context = args = null;
-  };
-  return function() {
-    var now = Date.now();
-    if (!previous && options.leading === false) previous = now;
-    var remaining = wait - (now - previous);
-    context = this;
-    args = arguments;
-    if (remaining <= 0 || remaining > wait) {
-      if (timeout) {
-        clearTimeout(timeout);
-        timeout = null;
-      }
-      previous = now;
-      result = func.apply(context, args);
-      if (!timeout) context = args = null;
-    } else if (!timeout && options.trailing !== false) {
-      timeout = setTimeout(later, remaining);
-    }
-    return result;
-  };
-};
 
 const throttledDriveWithHeading = throttle((rvrToy, speed, theta, backward) => {
   // The driveWithHeading command takes in a speed you'd like to drive at and a direction 
@@ -120,8 +84,12 @@ function Main(props) {
     } else {
       const deltaMs = Date.now() - lastCheckMs.current;
       lastCheckMs.current = Date.now();
-      degree = right && !backward ? degree : -degree;
-      degree = lastHeading.current + deltaMs * 0.18 * (degree / 180); // YAW rate, 1 --second for 180 degrees
+      if (right) {
+        degree = !backward ? degree : -degree;
+      } else {
+        degree = !backward ? -degree : degree;
+      }
+      degree = lastHeading.current + deltaMs * 0.15 * (degree / 180); // YAW rate, 1 --second for 180 degrees
       degree = Math.round(degree % 360);
       if (degree < 0) {
         degree += 360;
@@ -138,8 +106,12 @@ function Main(props) {
   const onRightXChange = useCallback((x) => setRightAxis({ x, y: 0 }), [setRightAxis]);
   const onLeftTriggerPressed = useCallback((value) => setLeftAxis({ x: 0, y: value }), [setLeftAxis]);
   const onRightTriggerPressed = useCallback((value) => setLeftAxis({ x: 0, y: -value }), [setLeftAxis]);
-  const onLeftBumperPressed = useCallback(() => setMaxSpeed(Math.max(maxSpeed - 1, 1)), [maxSpeed, setMaxSpeed]);
-  const onRightBumperPressed = useCallback(() => setMaxSpeed(Math.min(maxSpeed + 1, 255)), [maxSpeed, setMaxSpeed]);
+  const onMaxSpeedChanged = useCallback((value) => {
+    setMaxSpeed(value);
+    rvrToy && rvrToy.getLedControl().setAllLedsRgb(150, 100, value);
+  }, [rvrToy, setMaxSpeed]);
+  const onLeftBumperPressed = useCallback(() => onMaxSpeedChanged(Math.max(maxSpeed - 10, 60)), [maxSpeed, onMaxSpeedChanged]);
+  const onRightBumperPressed = useCallback(() => onMaxSpeedChanged(Math.min(maxSpeed + 10, 255)), [maxSpeed, onMaxSpeedChanged]);
 
   return (
     <div className="Main">
@@ -147,12 +119,12 @@ function Main(props) {
           <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=" alt="Live camera" style={{ width: '100%' }} />
         </object>}
         <Battery level={battery} />
-        <Range className="SppedRange" value={maxSpeed} onChange={setMaxSpeed} />
+        <Range className="SppedRange" value={maxSpeed} onChange={onMaxSpeedChanged} />
         <img className="Settings" src={CogWheelIcon} onClick={props.showSettings} alt="Settings" />
         <div className='Info'>
-          <div>Left: {leftAxis.y.toFixed(2)}</div>
+          {/* <div>Left: {leftAxis.y.toFixed(2)}</div>
           <div>Right: {rightAxis.x.toFixed(2)}</div>
-          <div>{props.settings.gamepadId}</div>
+          <div>{props.settings.gamepadId}</div> */}
           {props.settings.gauge && <div>
             <RadialGauge units='cm/s' width={300} value={velocity} minValue={0} startAngle={90} ticksAngle={180} maxValue={180}
               majorTicks={["0", "20", "40", "60", "80", "100", "120", "140", "160", "180"]}

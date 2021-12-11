@@ -66,7 +66,7 @@ function Settings({ settings, close }) {
             </div>
             <div>
                 <input type="checkbox" id="gauge" defaultChecked={gauge} onChange={(e) => setGauge(!gauge)} ></input>
-                <label htmlFor="gauge">Speedoneter</label>
+                <label htmlFor="gauge">Speedometer</label>
             </div>
             <div>
                 <input type="checkbox" id="fullscreen" defaultChecked={fullscreen} onChange={(e) => setFullscreen(!fullscreen)} ></input>
