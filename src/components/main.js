@@ -112,6 +112,37 @@ function Main(props) {
   }, [rvrToy, setMaxSpeed]);
   const onLeftBumperPressed = useCallback(() => onMaxSpeedChanged(Math.max(maxSpeed - 10, 60)), [maxSpeed, onMaxSpeedChanged]);
   const onRightBumperPressed = useCallback(() => onMaxSpeedChanged(Math.min(maxSpeed + 10, 255)), [maxSpeed, onMaxSpeedChanged]);
+  const onKeyDown = useCallback((e) => {
+    if (e.keyCode === 65 || e.keyCode === 37) { // A
+      onRightJoystickChange({ x: -1 });
+    } else if (e.keyCode === 68 || e.keyCode === 39) { //D
+      onRightJoystickChange({ x: 1 });
+    } else if (e.keyCode === 87 || e.keyCode === 38) { //W
+      onLeftJoystickChange({ y: -1 });
+    } else if (e.keyCode === 83 || e.keyCode === 40) { //S
+      onLeftJoystickChange({ y: 1 });
+    }
+  }, [onRightJoystickChange, onLeftJoystickChange]);
+  const onKeyUp = useCallback((e) => {
+    if (e.keyCode === 65 || e.keyCode === 37) { // A
+      onRightJoystickChange({ x: 0 });
+    } else if (e.keyCode === 68 || e.keyCode === 39) { //D
+      onRightJoystickChange({ x: 0 });
+    } else if (e.keyCode === 87 || e.keyCode === 38) { //W
+      onLeftJoystickChange({ y: 0 });
+    } else if (e.keyCode === 83 || e.keyCode === 40) { //S
+      onLeftJoystickChange({ y: 0 });
+    }
+  }, [onRightJoystickChange, onLeftJoystickChange]);
+
+  useEffect(() => {
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    return () => {
+        window.removeEventListener('keydown', onKeyDown);
+        window.removeEventListener('keyup', onKeyUp);
+    }
+}, [onKeyDown, onKeyUp]);
 
   return (
     <div className="Main">
