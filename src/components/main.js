@@ -52,7 +52,7 @@ function Main(props) {
         if (sensorControl.isStreaming) {
           sensorControl.clearSensorStreaming();
         }
-        sensorControl.startSensorStreaming(700);
+        sensorControl.startSensorStreaming(50);
         return () => {
           sensorControl.clearSensorStreaming();
         }
@@ -117,20 +117,19 @@ function Main(props) {
       onRightJoystickChange({ x: -1 });
     } else if (e.keyCode === 68 || e.keyCode === 39) { //D
       onRightJoystickChange({ x: 1 });
-    } else if (e.keyCode === 87 || e.keyCode === 38) { //W
+    }
+
+    if (e.keyCode === 87 || e.keyCode === 38) { //W
       onLeftJoystickChange({ y: -1 });
     } else if (e.keyCode === 83 || e.keyCode === 40) { //S
       onLeftJoystickChange({ y: 1 });
     }
   }, [onRightJoystickChange, onLeftJoystickChange]);
   const onKeyUp = useCallback((e) => {
-    if (e.keyCode === 65 || e.keyCode === 37) { // A
+    if (e.keyCode === 65 || e.keyCode === 37 || e.keyCode === 68 || e.keyCode === 39) {
       onRightJoystickChange({ x: 0 });
-    } else if (e.keyCode === 68 || e.keyCode === 39) { //D
-      onRightJoystickChange({ x: 0 });
-    } else if (e.keyCode === 87 || e.keyCode === 38) { //W
-      onLeftJoystickChange({ y: 0 });
-    } else if (e.keyCode === 83 || e.keyCode === 40) { //S
+    }
+    if (e.keyCode === 87 || e.keyCode === 38 || e.keyCode === 83 || e.keyCode === 40) {
       onLeftJoystickChange({ y: 0 });
     }
   }, [onRightJoystickChange, onLeftJoystickChange]);
@@ -166,8 +165,8 @@ function Main(props) {
                     "color": "rgba(200, 50, 50, .75)"
                 }
               ]}
-              minorTicks={2} borders={false} colorPlate={'#000'} animationDuration={500}
-              animationRule={'linear'} colorNumbers={'#eee'} colorBorderOuter={'#000'} colorBorderMiddle={'#000'}
+              minorTicks={2} borders={false} colorPlate={'#000'} animationDuration={100}
+              animationRule={'elastic'} colorNumbers={'#eee'} colorBorderOuter={'#000'} colorBorderMiddle={'#000'}
             ></RadialGauge>
           </div>}
         </div>
