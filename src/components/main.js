@@ -5,7 +5,7 @@ import CogWheelIcon from '../images/cogwheel.svg';
 import Battery from './battery';
 import Range from './range';
 import { RadialGauge } from 'react-canvas-gauges';
-import { SpheroRvrToy } from 'sdk-v4-convenience-raspberry-pi-client-js';
+import { SpheroRvrToy } from 'sphero-sdk-raspberrypi-clientjs/v1.0/sphero-rvr-toy';
 import throttle from '../utils/throttle';
 
 /**
@@ -47,12 +47,12 @@ function Main(props) {
         const sensorControl = car.getSensorControl();
         sensorControl.enableSensor(sensorControl.velocity, data => {
           const velocity = Math.sqrt((data.X ** 2) + (data.Y ** 2));
-          setVelocity(velocity);
+          setVelocity(velocity * 100);
         });
         if (sensorControl.isStreaming) {
           sensorControl.clearSensorStreaming();
         }
-        sensorControl.startSensorStreaming(100);
+        sensorControl.startSensorStreaming(700);
         return () => {
           sensorControl.clearSensorStreaming();
         }
