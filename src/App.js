@@ -7,7 +7,7 @@ function App() {
   const [screen, setScreen] = useState('main');
   const [settings, setSettings] = useState({ 
                                     piAddress: window.location.hostname === 'localhost' ? '192.168.0.73' : window.location.hostname, 
-                                    camera: true, joysticks: true, gauge: true, fullscreen: false 
+                                    camera: true, joysticks: true, gauge: true, fullscreen: false, upsidedown: true
                                   });
   const showSettings = useCallback(() => setScreen('settings'), [setScreen]);
   const closeSettings = useCallback(settings => {

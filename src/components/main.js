@@ -34,14 +34,24 @@ function Main(props) {
   const lastHeading = useRef(0);
   const lastLeftAxisY = useRef(0);
   const lastRightAxisX = useRef(0);
+
+  const updateBattery = useCallback((car) => {
+    if (!car) {
+      return;
+    }
+    const update = async() => {
+      const data = await car.getBatteryPercentage(1)
+      const obj = data ? JSON.parse(data) : null;
+      setBattery(obj?.percentage ?? 0);
+    }
+    update();
+  }, [setBattery]);
+
   useEffect(() => {
     const connect = async() => {
       try {
         const car = new SpheroRvrToy(props.settings.piAddress, '2010');
         car.wake();
-        const data = await car.getBatteryPercentage(1)
-        const obj = data ? JSON.parse(data) : null;
-        setBattery(obj?.percentage ?? 0);
         setRvrToy(car);
         car.getDriveControl().resetHeading();
         const sensorControl = car.getSensorControl();
@@ -53,6 +63,7 @@ function Main(props) {
           sensorControl.clearSensorStreaming();
         }
         sensorControl.startSensorStreaming(50);
+        updateBattery(car);
         return () => {
           sensorControl.clearSensorStreaming();
         }
@@ -62,7 +73,7 @@ function Main(props) {
       }
     }
     connect();
-  }, [props.settings.piAddress]);
+  }, [props.settings.piAddress, updateBattery]);
 
   // drive the car whenever leftAxis or rightAxis changed
   useEffect(() => {
@@ -96,9 +107,9 @@ function Main(props) {
       }
     }
     
-    lastHeading.current = degree;
+    lastHeading.current = props.settings.upsidedown ? -degree : degree;
     throttledDriveWithHeading(rvrToy, speed, lastHeading.current, backward);
-  }, [rvrToy, leftAxis, rightAxis, maxSpeed]);
+  }, [rvrToy, leftAxis, rightAxis, maxSpeed, props.settings.upsidedown]);
 
   const onLeftJoystickChange = useCallback(({ _, y }) => setLeftAxis({ x: 0, y }), [setLeftAxis]);
   const onRightJoystickChange = useCallback(({ x, _ }) => setRightAxis({ x, y: 0 }), [setRightAxis]);
@@ -137,15 +148,19 @@ function Main(props) {
   useEffect(() => {
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
+    const intv = setInterval(() => {
+      updateBattery(rvrToy);
+    }, 5000);
     return () => {
         window.removeEventListener('keydown', onKeyDown);
         window.removeEventListener('keyup', onKeyUp);
+        intv && clearInterval(intv);
     }
-}, [onKeyDown, onKeyUp]);
+  }, [onKeyDown, onKeyUp, updateBattery, rvrToy]);
 
   return (
     <div className="Main">
-        {props.settings.camera && <object data={`http://${props.settings.piAddress}:3000/stream.mjpg`} type="image/jpg" style={{ width: '100%' }}>
+        {props.settings.camera && <object data={`http://${props.settings.piAddress}:3000/stream.mjpg`} type="image/jpg" style={{ width: '100%', transform: props.settings.upsidedown ? 'rotateX(180deg)' : '' }}>
           <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=" alt="Live camera" style={{ width: '100%' }} />
         </object>}
         <Battery level={battery} />

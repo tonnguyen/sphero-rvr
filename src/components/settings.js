@@ -7,6 +7,7 @@ function Settings({ settings, close }) {
     const [joysticks, setJoysticks] = useState(settings.joysticks);
     const [gauge, setGauge] = useState(settings.gauge);
     const [fullscreen, setFullscreen] = useState(settings.fullscreen);
+    const [upsidedown, setUpsidedown] = useState(settings.upsidedown);
     const [ids, setIds] = useState([]);
 
     const scan = useCallback(() => {
@@ -38,11 +39,12 @@ function Settings({ settings, close }) {
             joysticks,
             gauge,
             fullscreen,
+            upsidedown,
         });
         fullscreen && document.fullscreenEnabled && !document.fullscreenElement && document.body.requestFullscreen();
         !fullscreen && document.fullscreenElement && document.exitFullscreen();
         e.preventDefault();
-    }, [close, gamepadId, ids, piAddress, camera, joysticks, gauge, fullscreen]);
+    }, [close, gamepadId, ids, piAddress, camera, joysticks, gauge, fullscreen, upsidedown]);
 
     return (
         <form onSubmit={submit}>
@@ -67,6 +69,10 @@ function Settings({ settings, close }) {
             <div>
                 <input type="checkbox" id="gauge" defaultChecked={gauge} onChange={(e) => setGauge(!gauge)} ></input>
                 <label htmlFor="gauge">Speedometer</label>
+            </div>
+            <div>
+                <input type="checkbox" id="upsidedown" defaultChecked={upsidedown} onChange={(e) => setUpsidedown(!upsidedown)} ></input>
+                <label htmlFor="upsidedown">Upsidedown</label>
             </div>
             <div>
                 <input type="checkbox" id="fullscreen" defaultChecked={fullscreen} onChange={(e) => setFullscreen(!fullscreen)} ></input>
