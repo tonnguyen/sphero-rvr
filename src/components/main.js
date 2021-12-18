@@ -107,7 +107,7 @@ function Main(props) {
       }
     }
     
-    lastHeading.current = props.settings.upsidedown ? -degree : degree;
+    lastHeading.current = degree;
     throttledDriveWithHeading(rvrToy, speed, lastHeading.current, backward);
   }, [rvrToy, leftAxis, rightAxis, maxSpeed, props.settings.upsidedown]);
 
@@ -160,7 +160,7 @@ function Main(props) {
 
   return (
     <div className="Main">
-        {props.settings.camera && <object data={`http://${props.settings.piAddress}:3000/stream.mjpg`} type="image/jpg" style={{ width: '100%', transform: props.settings.upsidedown ? 'rotateX(180deg)' : '' }}>
+        {props.settings.camera && <object data={`http://${props.settings.piAddress}:3000/stream.mjpg`} type="image/jpg" style={{ width: '100%', transform: props.settings.upsidedown ? 'rotateX(180deg) scaleX(-1)' : '' }}>
           <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=" alt="Live camera" style={{ width: '100%' }} />
         </object>}
         <Battery level={battery} />
